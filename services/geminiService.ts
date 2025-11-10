@@ -1,19 +1,33 @@
-import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI, Chat as GenAiChat, GenerateContentResponse } from "@google/genai";
 import { Message, User } from '../types';
 
-const API_KEY = process.env.API_KEY;
+// Lazily initialize the AI instance to avoid crashing the app on load if API_KEY is not set.
+let ai: GoogleGenAI | null = null;
 
-if (!API_KEY) {
-  throw new Error("API_KEY environment variable not set");
+function getAi() {
+  if (!ai) {
+    // Safely access process.env to prevent ReferenceError in browser environments like Vercel.
+    const API_KEY = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
+    if (API_KEY) {
+      ai = new GoogleGenAI({ apiKey: API_KEY });
+    } else {
+      console.error("API_KEY environment variable not set. AI features will be disabled.");
+    }
+  }
+  return ai;
 }
 
-const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 const model = 'gemini-2.5-flash';
 
 export const getAiResponse = async (history: Message[], newMessage: string, currentUserId: string): Promise<string> => {
+  const aiInstance = getAi();
+  if (!aiInstance) {
+    return "AI service is not available. Please configure the API key.";
+  }
+
   try {
-    const chat: Chat = ai.chats.create({
+    const chat: GenAiChat = aiInstance.chats.create({
       model: model,
       history: history.map(msg => ({
         role: msg.senderId === currentUserId ? 'user' : 'model',
@@ -33,6 +47,11 @@ export const getAiResponse = async (history: Message[], newMessage: string, curr
 };
 
 export const summarizeChat = async (messages: Message[], participants: User[]): Promise<string> => {
+  const aiInstance = getAi();
+  if (!aiInstance) {
+    return "AI service is not available. Please configure the API key.";
+  }
+
   try {
     const userMap = new Map(participants.map(p => [p.id, p.name]));
     
@@ -42,7 +61,7 @@ export const summarizeChat = async (messages: Message[], participants: User[]): 
 
     const prompt = `Please provide a concise summary of the following chat conversation:\n\n---\n${formattedHistory}\n---`;
 
-    const response = await ai.models.generateContent({
+    const response = await aiInstance.models.generateContent({
       model: model,
       contents: prompt,
     });
