@@ -1,0 +1,5 @@
+{
+  "name": "Gemini Messenger",
+  "description": "A full-stack messaging application inspired by WhatsApp, featuring a smart AI contact powered by the Gemini API for intelligent conversations.",
+  "requestFramePermissions": []
+}
