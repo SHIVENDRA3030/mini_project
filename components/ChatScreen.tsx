@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Chat, User, Message } from '../types';
 import { ChatMessage } from './ChatMessage';
-import { ArrowLeftIcon, SendIcon, MoreVertIcon, CloseIcon } from './icons';
+import { ArrowLeftIcon, SendIcon, MoreVertIcon, CloseIcon, VideoCallIcon, VoiceCallIcon } from './icons';
 import { getAiResponse, summarizeChat } from '../services/geminiService';
 import { updateTypingStatus } from '../services/firebaseService';
 
@@ -126,48 +126,64 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ chat, currentUser, onSen
     setIsSummarizing(false);
   };
 
+  const handleVoiceCall = () => {
+    alert(`Starting voice call with ${otherParticipant?.name}... (This is a demo feature)`);
+  };
+
+  const handleVideoCall = () => {
+    alert(`Starting video call with ${otherParticipant?.name}... (This is a demo feature)`);
+  };
+
   if (!otherParticipant) {
     return <div className="flex items-center justify-center h-full text-gray-500">Select a chat to start messaging</div>;
   }
 
   const TypingIndicator = () => (
     <div className="flex w-full my-1 justify-start">
-      <div className="px-4 py-2 rounded-lg max-w-sm shadow bg-slate-700 rounded-bl-none">
+      <div className="px-4 py-2 rounded-lg max-w-sm shadow bg-gray-200 rounded-bl-none">
           <div className="flex items-center space-x-1">
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+              <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+              <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
           </div>
       </div>
     </div>
   );
 
   return (
-    <div className="flex flex-col h-full bg-slate-900 text-gray-200">
+    <div className="flex flex-col h-full bg-gray-100 text-gray-800">
       {/* Header */}
-      <header className="flex items-center p-3 border-b border-slate-800 bg-slate-800 shadow-sm">
-        <button onClick={onBack} className="md:hidden mr-3 p-2 rounded-full hover:bg-slate-700">
+      <header className="flex items-center p-3 border-b border-gray-300 bg-gray-200 shadow-sm">
+        <button onClick={onBack} className="md:hidden mr-3 p-2 rounded-full hover:bg-gray-300">
           <ArrowLeftIcon className="w-6 h-6" />
         </button>
         <img src={otherParticipant.avatarUrl} alt={otherParticipant.name} className="w-10 h-10 rounded-full mr-3" />
         <div className="flex-1">
-          <h2 className="text-lg font-semibold text-gray-100">{otherParticipant.name}</h2>
-          {isOtherUserTyping && <p className="text-sm text-indigo-400 animate-pulse">typing...</p>}
+          <h2 className="text-lg font-semibold text-gray-900">{otherParticipant.name}</h2>
+          {isOtherUserTyping && <p className="text-sm text-indigo-600 animate-pulse">typing...</p>}
         </div>
-        <div className="relative" ref={menuRef}>
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 rounded-full hover:bg-slate-700" aria-label="Chat options">
-                <MoreVertIcon className="w-6 h-6 text-gray-300" />
+        <div className="flex items-center space-x-1">
+            <button onClick={handleVideoCall} className="p-2 rounded-full hover:bg-gray-300" aria-label="Video call">
+                <VideoCallIcon className="w-6 h-6 text-gray-600" />
             </button>
-            {isMenuOpen && (
-                <div className="absolute top-full right-0 mt-2 w-48 bg-slate-800 rounded-md shadow-lg z-20 border border-slate-700">
-                    <button
-                        onClick={handleSummarize}
-                        className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-slate-700"
-                    >
-                        Summarize Chat
-                    </button>
-                </div>
-            )}
+            <button onClick={handleVoiceCall} className="p-2 rounded-full hover:bg-gray-300" aria-label="Voice call">
+                <VoiceCallIcon className="w-6 h-6 text-gray-600" />
+            </button>
+            <div className="relative" ref={menuRef}>
+                <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 rounded-full hover:bg-gray-300" aria-label="Chat options">
+                    <MoreVertIcon className="w-6 h-6 text-gray-600" />
+                </button>
+                {isMenuOpen && (
+                    <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20 border border-gray-200">
+                        <button
+                            onClick={handleSummarize}
+                            className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                            Summarize Chat
+                        </button>
+                    </div>
+                )}
+            </div>
         </div>
       </header>
 
@@ -181,14 +197,14 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ chat, currentUser, onSen
       </main>
 
       {/* Input */}
-      <footer className="p-3 border-t border-slate-800 bg-slate-800">
+      <footer className="p-3 border-t border-gray-300 bg-gray-200">
         <form onSubmit={handleSendMessage} className="flex items-center">
           <input
             type="text"
             value={inputText}
             onChange={handleInputChange}
             placeholder="Type a message..."
-            className="flex-1 p-3 rounded-full bg-slate-700 text-gray-100 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="flex-1 p-3 rounded-full bg-white text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <button
             type="submit"
@@ -208,10 +224,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ chat, currentUser, onSen
             aria-modal="true"
             role="dialog"
         >
-            <div className="bg-slate-800 rounded-lg shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col transform transition-all duration-300 scale-95 opacity-0 animate-scale-in">
-                <div className="flex items-center justify-between p-4 border-b border-slate-700">
+            <div className="bg-white text-gray-800 rounded-lg shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col transform transition-all duration-300 scale-95 opacity-0 animate-scale-in">
+                <div className="flex items-center justify-between p-4 border-b border-gray-200">
                     <h3 className="text-xl font-semibold">Chat Summary</h3>
-                    <button onClick={() => setIsSummaryModalOpen(false)} className="p-1 rounded-full hover:bg-slate-600" aria-label="Close">
+                    <button onClick={() => setIsSummaryModalOpen(false)} className="p-1 rounded-full hover:bg-gray-100" aria-label="Close">
                         <CloseIcon className="w-6 h-6" />
                     </button>
                 </div>
@@ -224,10 +240,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ chat, currentUser, onSen
                             <span className="ml-2">Summarizing...</span>
                         </div>
                     ) : (
-                        <p className="text-base text-gray-200 whitespace-pre-wrap">{summary}</p>
+                        <p className="text-base text-gray-700 whitespace-pre-wrap">{summary}</p>
                     )}
                 </div>
-                <div className="flex justify-end p-4 border-t border-slate-700">
+                <div className="flex justify-end p-4 border-t border-gray-200">
                     <button 
                         onClick={() => setIsSummaryModalOpen(false)}
                         className="px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600"

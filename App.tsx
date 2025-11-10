@@ -61,7 +61,7 @@ const App: React.FC = () => {
     };
 
     if (isLoading) {
-      return <div className="flex items-center justify-center h-screen bg-slate-900 text-gray-100">Loading...</div>;
+      return <div className="flex items-center justify-center h-screen bg-gray-100 text-gray-800">Loading...</div>;
     }
 
     if (!currentUser) {
@@ -77,7 +77,7 @@ const App: React.FC = () => {
 
 const LoginPage: React.FC<{ users: User[], onLogin: (user: User) => void }> = ({ users, onLogin }) => {
     return (
-        <div className="flex flex-col items-center h-screen bg-gray-900 text-gray-100 p-4">
+        <div className="flex flex-col items-center h-screen bg-gray-100 text-gray-800 p-4">
             <h1 className="text-3xl font-bold my-6 flex-shrink-0">Who are you?</h1>
             <div className="w-full max-w-xs overflow-y-auto">
                 <div className="flex flex-col items-center gap-4 p-2">
@@ -85,9 +85,9 @@ const LoginPage: React.FC<{ users: User[], onLogin: (user: User) => void }> = ({
                         <div
                             key={user.id}
                             onClick={() => onLogin(user)}
-                            className="w-full flex flex-col items-center p-4 bg-gray-800 rounded-lg shadow-lg cursor-pointer transition-transform duration-200 hover:scale-105 hover:bg-gray-700"
+                            className="w-full flex flex-col items-center p-4 bg-white rounded-lg shadow-md cursor-pointer transition-transform duration-200 hover:scale-105 hover:bg-gray-50"
                         >
-                            <img src={user.avatarUrl} alt={user.name} className="w-20 h-20 rounded-full mb-3 border-2 border-gray-600" />
+                            <img src={user.avatarUrl} alt={user.name} className="w-20 h-20 rounded-full mb-3 border-2 border-gray-300" />
                             <h2 className="text-lg font-medium">{user.name}</h2>
                         </div>
                     ))}
@@ -121,16 +121,16 @@ const NewChatModal: React.FC<{
       role="dialog"
     >
       <div 
-        className="bg-slate-800 rounded-lg shadow-xl w-full max-w-md max-h-[80vh] flex flex-col transform transition-all duration-300 scale-95 opacity-0 animate-scale-in text-gray-200"
+        className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[80vh] flex flex-col transform transition-all duration-300 scale-95 opacity-0 animate-scale-in text-gray-800"
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
       >
-        <div className="flex items-center justify-between p-4 border-b border-slate-700">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <h3 className="text-xl font-semibold">Select a contact</h3>
-          <button onClick={onClose} className="p-1 rounded-full hover:bg-slate-600" aria-label="Close">
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100" aria-label="Close">
             <CloseIcon className="w-6 h-6" />
           </button>
         </div>
-        <div className="p-2 border-b border-slate-700">
+        <div className="p-2 border-b border-gray-200">
            <div className="relative">
              <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                <SearchIcon className="w-5 h-5 text-gray-400" />
@@ -138,7 +138,7 @@ const NewChatModal: React.FC<{
              <input
                type="text"
                placeholder="Search contacts"
-               className="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-700 text-sm text-gray-100 border border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500"
+               className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-100 text-sm text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                value={searchQuery}
                onChange={(e) => setSearchQuery(e.target.value)}
                autoFocus
@@ -150,7 +150,7 @@ const NewChatModal: React.FC<{
             <div 
               key={user.id} 
               onClick={() => onSelectUser(user.id)} 
-              className="flex items-center p-3 hover:bg-slate-700 cursor-pointer transition-colors duration-200"
+              className="flex items-center p-3 hover:bg-gray-100 cursor-pointer transition-colors duration-200"
             >
               <img src={user.avatarUrl} alt={user.name} className="w-10 h-10 rounded-full mr-3" />
               <span className="font-medium">{user.name}</span>
@@ -200,7 +200,7 @@ const MainLayout: React.FC<{ currentUser: User, onLogout: () => void, allUsers: 
 
   return (
     <>
-    <div className="h-full w-full font-sans flex text-gray-100 bg-slate-900">
+    <div className="h-full w-full font-sans flex text-gray-800 bg-white">
       {/* ChatList Pane: Hidden on mobile when a chat is active */}
       <div className={`h-full w-full md:w-1/3 lg:w-1/4 flex-shrink-0 ${activeChatId ? 'hidden' : 'flex'} md:flex`}>
           <ChatList
@@ -244,14 +244,14 @@ const MainLayout: React.FC<{ currentUser: User, onLogout: () => void, allUsers: 
 
 const WelcomeScreen: React.FC = () => {
     return (
-        <div className="flex-1 flex flex-col items-center justify-center text-center p-4 bg-slate-800 border-l border-slate-700">
+        <div className="flex-1 flex flex-col items-center justify-center text-center p-4 bg-gray-100 border-l border-gray-200">
              <div className="w-24 h-24 mb-6">
-                <svg viewBox="0 0 24 24" fill="currentColor" className="text-slate-600">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="text-gray-300">
                     <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
                 </svg>
             </div>
-            <h1 className="text-3xl font-bold text-gray-200">Welcome to Gemini Messenger</h1>
-            <p className="mt-2 text-lg text-gray-400">Select a chat to start messaging.</p>
+            <h1 className="text-3xl font-bold text-gray-800">Welcome to Gemini Messenger</h1>
+            <p className="mt-2 text-lg text-gray-500">Select a chat to start messaging.</p>
         </div>
     );
 }
