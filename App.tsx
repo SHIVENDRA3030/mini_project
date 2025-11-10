@@ -27,6 +27,54 @@ const getInitialUser = (): User | null => {
     }
 };
 
+const App: React.FC = () => {
+    const [currentUser, setCurrentUser] = useState<User | null>(getInitialUser);
+    const [allUsers, setAllUsers] = useState<User[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Seed database and fetch users on initial load
+    useEffect(() => {
+        const initializeApp = async () => {
+            await seedDatabase();
+            const usersFromDb = await getUsers();
+            setAllUsers(usersFromDb);
+            setIsLoading(false);
+        };
+        initializeApp();
+    }, []);
+
+    // Persist current user in localStorage for session management
+    useEffect(() => {
+        if (currentUser) {
+            localStorage.setItem(CURRENT_USER_STORAGE_KEY, JSON.stringify(currentUser));
+        } else {
+            localStorage.removeItem(CURRENT_USER_STORAGE_KEY);
+        }
+    }, [currentUser]);
+
+    const handleLogin = (user: User) => {
+        setCurrentUser(user);
+    };
+
+    const handleLogout = () => {
+        setCurrentUser(null);
+    };
+
+    if (isLoading) {
+      return <div className="flex items-center justify-center h-screen bg-gray-100 text-gray-800">Loading...</div>;
+    }
+
+    if (!currentUser) {
+        return <LoginPage onLogin={handleLogin} users={allUsers.filter(u => !u.isAi)} />;
+    }
+
+    return (
+        <HashRouter>
+            <MainLayout currentUser={currentUser} onLogout={handleLogout} allUsers={allUsers} />
+        </HashRouter>
+    );
+};
+
 const LoginPage: React.FC<{ users: User[], onLogin: (user: User) => void }> = ({ users, onLogin }) => {
     return (
         <div className="flex flex-col items-center h-screen bg-gray-100 text-gray-800 p-4">
@@ -116,19 +164,6 @@ const NewChatModal: React.FC<{
   );
 };
 
-const WelcomeScreen: React.FC = () => {
-    return (
-        <div className="flex-1 flex flex-col items-center justify-center text-center p-4 bg-gray-100 border-l border-gray-200">
-             <div className="w-24 h-24 mb-6">
-                <svg viewBox="0 0 24 24" fill="currentColor" className="text-gray-300">
-                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
-                </svg>
-            </div>
-            <h1 className="text-3xl font-bold text-gray-800">Welcome to Gemini Messenger</h1>
-            <p className="mt-2 text-lg text-gray-500">Select a chat to start messaging.</p>
-        </div>
-    );
-}
 
 const MainLayout: React.FC<{ currentUser: User, onLogout: () => void, allUsers: User[] }> = ({ currentUser, onLogout, allUsers }) => {
   const [chats, setChats] = useState<ChatType[]>([]);
@@ -207,52 +242,18 @@ const MainLayout: React.FC<{ currentUser: User, onLogout: () => void, allUsers: 
   );
 };
 
-const App: React.FC = () => {
-    const [currentUser, setCurrentUser] = useState<User | null>(getInitialUser);
-    const [allUsers, setAllUsers] = useState<User[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    // Seed database and fetch users on initial load
-    useEffect(() => {
-        const initializeApp = async () => {
-            await seedDatabase();
-            const usersFromDb = await getUsers();
-            setAllUsers(usersFromDb);
-            setIsLoading(false);
-        };
-        initializeApp();
-    }, []);
-
-    // Persist current user in localStorage for session management
-    useEffect(() => {
-        if (currentUser) {
-            localStorage.setItem(CURRENT_USER_STORAGE_KEY, JSON.stringify(currentUser));
-        } else {
-            localStorage.removeItem(CURRENT_USER_STORAGE_KEY);
-        }
-    }, [currentUser]);
-
-    const handleLogin = (user: User) => {
-        setCurrentUser(user);
-    };
-
-    const handleLogout = () => {
-        setCurrentUser(null);
-    };
-
-    if (isLoading) {
-      return <div className="flex items-center justify-center h-screen bg-gray-100 text-gray-800">Loading...</div>;
-    }
-
-    if (!currentUser) {
-        return <LoginPage onLogin={handleLogin} users={allUsers.filter(u => !u.isAi)} />;
-    }
-
+const WelcomeScreen: React.FC = () => {
     return (
-        <HashRouter>
-            <MainLayout currentUser={currentUser} onLogout={handleLogout} allUsers={allUsers} />
-        </HashRouter>
+        <div className="flex-1 flex flex-col items-center justify-center text-center p-4 bg-gray-100 border-l border-gray-200">
+             <div className="w-24 h-24 mb-6">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="text-gray-300">
+                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                </svg>
+            </div>
+            <h1 className="text-3xl font-bold text-gray-800">Welcome to Gemini Messenger</h1>
+            <p className="mt-2 text-lg text-gray-500">Select a chat to start messaging.</p>
+        </div>
     );
-};
+}
 
 export default App;
